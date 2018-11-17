@@ -1,16 +1,32 @@
-# unix-formatting-transformer
+```
+   ▄████████ ███▄▄▄▄      ▄████████  ▄█  ████████▄     ▄████████  ▄████████
+  ███    ███ ███▀▀▀██▄   ███    ███ ███  ███   ▀███   ███    ███ ███    ███
+  ███    ███ ███   ███   ███    █▀  ███▌ ███    ███   ███    █▀  ███    █▀
+  ███    ███ ███   ███   ███        ███▌ ███    ███  ▄███▄▄▄     ███
+▀███████████ ███   ███ ▀███████████ ███▌ ███    ███ ▀▀███▀▀▀     ███
+  ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
+  ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
+  ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
+```
 
-Library for handling ANSI escape sequences for use in Browsers.
+ANSIDec is a library for handling ANSI escape sequences for use in Browsers.
 The primary goal of the library is to allow of displaying ANSI and ASCII
-art in Browsers. But it can also be used from Node.js.
+art in Browsers by transforming Unix encoding to html.
+But it can also be used from Node.js.
 
 ## Installation
 
+Npm installation for use with webpack:
+
+```
+npm install ansidec
+```
+
 Besides npm you can also download that file locally or use
-[unpkg.com](https://unpkg.com/unix-formatting-transformer):
+[unpkg.com](https://unpkg.com/ansidec):
 
 ```html
-<script src="https://unpkg.com/unix-formatting-transformer"></script>
+<script src="https://unpkg.com/ansidec"></script>
 
 ```
 
@@ -18,9 +34,9 @@ Besides npm you can also download that file locally or use
 
 ```javascript
 // if you're using webpack or node.js you can use npm
-var uft = require('unix-formatter-transformer');
+var ansi = require('ansidec');
 
-var format = uft.format({
+var format = ansi.format({
     underline: function(text) {
         return '<span style="text-decoration: underline">' + text + '</span>';
     },
@@ -47,9 +63,9 @@ function. So it's like it was curried.
 If you want just to output html you can use helper:
 
 ```javascript
-var uft = require('unix-formatter-transformer');
+var ansi = require('ansidec');
 
-document.write(uft.html(text));
+document.write(ansi.html(text));
 
 ```
 
@@ -61,4 +77,3 @@ and use format only if you need different html or any different output text.
 Released under [MIT](http://opensource.org/licenses/MIT) license
 
 Copyright (c) 2018 [Jakub Jankiewicz](http://jcubic.pl/jakub-jankiewicz)
-

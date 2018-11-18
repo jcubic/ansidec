@@ -42,7 +42,13 @@ Besides npm you can also download that file locally or use
 var ansi = require('ansidec');
 
 var format = ansi.format(function(styles, color, background, text) {
-  var style = ['color:' + color, 'background: ' + background];
+  var style = [];
+  if (color) {
+    style.push('color:' + color);
+  }
+  if (background) {
+    style.push('background:' + background);
+  }
   if (styles.bold) {
     style.push('font-weight:bold');
   }

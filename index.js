@@ -552,7 +552,7 @@
                 style.push('color:' + color);
             }
             if (background) {
-                style.push('background: ' + background);
+                style.push('background:' + background);
             }
             if (styles.bold) {
                 style.push('font-weight:bold');

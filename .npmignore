@@ -1,1 +1,4 @@
 Makefile
+node_modules
+.travis.yml
+__test__

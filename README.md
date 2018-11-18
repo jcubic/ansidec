@@ -19,6 +19,10 @@ in Browsers. The primary goal of the library is to allow of displaying ANSI and 
 art in Browsers by transforming Unix encoding to html.
 But it can also be used from Node.js.
 
+## Demo
+
+https://jcubic.github.io/ansidec/
+
 ## Installation
 
 Npm installation for use with webpack:

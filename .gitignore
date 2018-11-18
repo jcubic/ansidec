@@ -1,8 +1,10 @@
 *~
 coverage
+npm-debug.log
 node_modules
 ansi-art
 iconv-src.js
 iconv.js
+.[0-9]*
 \#*
 .\#*

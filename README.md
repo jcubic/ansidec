@@ -37,18 +37,17 @@ Besides npm you can also download that file locally or use
 var ansi = require('ansidec');
 
 var format = ansi.format(function(styles, color, background, text) {
-        var style = ['color:' + color, 'background: ' + background];
-        if (styles.bold) {
-           style.push('font-weight:bold');
-        }
-        if (styles.italic) {
-           style.push('font-style:italic');
-        }
-        if (styles.underline) {
-           styles.push('text-decoration:underline');
-        }
-        return '<span style="' + style.join(';') + '">' + text + '</span>';
-    }
+  var style = ['color:' + color, 'background: ' + background];
+  if (styles.bold) {
+    style.push('font-weight:bold');
+  }
+  if (styles.italic) {
+    style.push('font-style:italic');
+  }
+  if (styles.underline) {
+    styles.push('text-decoration:underline');
+  }
+  return '<span style="' + style.join(';') + '">' + text + '</span>';
 });
 
 document.querySelector('pre').innerHTML = format(text);

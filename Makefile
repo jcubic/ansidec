@@ -1,4 +1,6 @@
+VERSION=0.1.0
 CD=cd
+CAT=cat
 NPM=npm
 RM=rm
 GIT=git
@@ -16,6 +18,8 @@ else
   ESLINT=./node_modules/.bin/eslint
 endif
 
+skip_re="[xfi]it\\(|[fdx]describe\\("
+
 all: dist/ascidec.min.js
 
 .PHONY: publish test lint
@@ -27,6 +31,9 @@ publish:
 
 test:
 	$(JEST) --coverage --testMatch '**/__test__/*.spec.js'
+
+.$(VERSION): Makefile
+	touch .$(VERSION)
 
 skipped_tests:
 	@! grep -E $(skip_re) __test__/ansidec.spec.js
@@ -40,5 +47,5 @@ lint:
 dist:
 	$(MKDIR) dist
 
-dist/ascidec.min.js: dist
+dist/ascidec.min.js: dist .$(VERSION)
 	$(UGLIFY) -o dist/ascidec.min.js --comments --mangle --source-map "includeSources,url='ascidec.min.js.map'" -- index.js

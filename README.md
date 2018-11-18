@@ -83,6 +83,13 @@ document.querySelector('pre').innerHTML = ansi.html(text)
 
 and use format only if you need different html or any different output text.
 
+## ANSI art
+
+If you want to render ANSI art with this library you will need to covert the text from
+ANSI art file to UTF-8 to do that you can use iconv-lite library or iconv on a Back-End
+see how to do that in
+[examples directory](https://github.com/jcubic/ansidec/tree/master/example).
+
 
 ### License
 

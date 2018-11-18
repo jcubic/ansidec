@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Side Decoding</title>
+  <script src="../index.js"></script>
+  <style>
+   body {
+       background: black;
+       color: #ccc;
+   }
+  </style>
+</head>
+<body>
+  <pre></pre>
+<script>
+ (async function() {
+     var files = (await fetch('read.php?action=ls').then(res => res.text())).trim();
+     function get_text(name) {
+         return fetch('read.php?file=' + name)
+             .then(res=>res.text());
+     }
+     var format = ansi.format(function(styles, color, background, text) {
+         var style = ['color:' + color, 'background: ' + background];
+         if (styles.bold) {
+             style.push('font-weight:bold');
+         }
+         if (styles.italic) {
+                 style.push('font-style:italic');
+         }
+         if (styles.underline) {
+             styles.push('text-decoration:underline');
+         }
+         return '<span style="' + style.join(';') + '">' + text + '</span>';
+     });
+     get_text('FILE_ID.ANS').then(text => {
+         document.querySelector('pre').innerHTML = format(text);
+     });
+ })();
+</script>
+</body>
+</html>

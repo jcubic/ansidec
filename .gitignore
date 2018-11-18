@@ -1,0 +1,8 @@
+*~
+coverage
+node_modules
+ansi-art
+iconv-src.js
+iconv.js
+\#*
+.\#*

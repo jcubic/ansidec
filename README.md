@@ -9,8 +9,8 @@
   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
 ```
 
-ANSIDec is a library for handling ANSI escape sequences for use in Browsers.
-The primary goal of the library is to allow of displaying ANSI and ASCII
+ANSIDec is a library for handling limited number of ANSI escape sequences for use
+in Browsers. The primary goal of the library is to allow of displaying ANSI and ASCII
 art in Browsers by transforming Unix encoding to html.
 But it can also be used from Node.js.
 
@@ -36,24 +36,22 @@ Besides npm you can also download that file locally or use
 // if you're using webpack or node.js you can use npm
 var ansi = require('ansidec');
 
-var format = ansi.format({
-    underline: function(text) {
-        return '<span style="text-decoration: underline">' + text + '</span>';
-    },
-    bold: function(text) {
-        return '<span style="font-weight: bold">' + text + '</span>';
-    },
-    format: function(color, background, text) {
-        var style = 'color:' + color + ';' + 'background: ' + background;
-        return '<span style="' + style + '">' + text + '</span>';
-    },
-    line: function(html) {
-        return '<div>' + html + '</div>';
+var format = ansi.format(function(styles, color, background, text) {
+        var style = ['color:' + color, 'background: ' + background];
+        if (styles.bold) {
+           style.push('font-weight:bold');
+        }
+        if (styles.italic) {
+           style.push('font-style:italic');
+        }
+        if (styles.underline) {
+           styles.push('text-decoration:underline');
+        }
+        return '<span style="' + style.join(';') + '">' + text + '</span>';
     }
-   }
 });
 
-document.write(format(text));
+document.querySelector('pre').innerHTML = format(text);
 ```
 
 format function can be executed with text as second argument, then it will
@@ -65,7 +63,7 @@ If you want just to output html you can use helper:
 ```javascript
 var ansi = require('ansidec');
 
-document.write(ansi.html(text));
+document.querySelector('pre').innerHTML = ansi.html(text)
 
 ```
 

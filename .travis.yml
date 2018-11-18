@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - 10.12.0
+install:
+  - npm install
+script:
+  - make
+  - make lint
+  - make skipped_tests || travis_terminate 1
+  - make test || travis_terminate 1
+after_script:
+  - make coveralls

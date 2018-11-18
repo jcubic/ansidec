@@ -1,5 +1,5 @@
 {
-  "name": "ascidec",
+  "name": "ansidec",
   "version": "0.1.0",
   "description": "Limited Unix ANSI escape sequences transformer for use in Browsers",
   "main": "index.js",

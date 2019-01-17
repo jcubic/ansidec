@@ -352,7 +352,7 @@
                         state.reverse = true;
                         break;
                     default:
-                        if (controls.indexOf('5') === -1) {
+                        if (controls[1] !== '5') {
                             if (color_list[num]) {
                                 output_color = color_list[num];
                             }
@@ -437,7 +437,7 @@
                 colors = ansi_colors.normal;
             }
             if (typeof output_color !== 'undefined') {
-                if (_ex_color) {
+                if (output_color.match(/^#/)) {
                     color = output_color;
                 } else if (output_color === 'inherit') {
                     color = output_color;
@@ -446,7 +446,7 @@
                 }
             }
             if (typeof output_background !== 'undefined') {
-                if (_ex_background) {
+                if (output_background.match(/^#/)) {
                     background = output_background;
                 } else if (output_background === 'transparent') {
                     background = output_background;

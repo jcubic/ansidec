@@ -2,3 +2,11 @@ Makefile
 node_modules
 .travis.yml
 __test__
+*~
+coverage
+ansi-art
+index.html
+.travis.ymap
+.[0-9]*
+iconv-src.js
+example

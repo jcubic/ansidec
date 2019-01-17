@@ -499,7 +499,6 @@
                 }
             }
             var code, match;
-            var inside = false;
             for (var i = 0; i < splitted.length; ++i) {
                 match = splitted[i].match(/^\x1B\[([0-9;]*)([A-Za-z])$/);
                 if (match) {

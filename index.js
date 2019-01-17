@@ -519,11 +519,9 @@
             }
             var formatting;
             return output.reduce(function(acc, obj) {
-                console.log({formatting, obj});
                 if (typeof obj === 'string') {
                     if (formatting && obj) {
                         var args = formatting.concat([obj]);
-                        console.log({obj, args});
                         if (typeof callback === 'function') {
                             return acc + callback.apply(null, args);
                         }

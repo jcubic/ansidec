@@ -506,11 +506,9 @@
                     switch (match[2]) {
                         case 'm':
                             code = format_ansi(match[1], state);
-                            if (inside) {
-                                if (+match[1] !== 0) {
-                                    output.push(code);
-                                }
-                            } else if (+match[1] !== 0) {
+                            if (+match[1] === 0) {
+                                output.push(false);
+                            } else {
                                 output.push(code);
                             }
                             break;
@@ -521,9 +519,11 @@
             }
             var formatting;
             return output.reduce(function(acc, obj) {
+                console.log({formatting, obj});
                 if (typeof obj === 'string') {
                     if (formatting && obj) {
                         var args = formatting.concat([obj]);
+                        console.log({obj, args});
                         if (typeof callback === 'function') {
                             return acc + callback.apply(null, args);
                         }

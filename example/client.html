@@ -19,7 +19,6 @@
      document.querySelector('#file').addEventListener('change', function(event) {
          var reader = new FileReader();
          reader.onload = function(event) {
-             output.innerHTML = ansi.html(event.target.result);
              format(event.target.result);
          };
          reader.readAsArrayBuffer(event.target.files[0]);

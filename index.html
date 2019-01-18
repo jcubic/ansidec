@@ -3,6 +3,22 @@
   <head>
     <meta charset="utf-8"/>
     <title>Client Decoding conversion</title>
+    <style>
+     span {
+         display: inline-block;
+         overflow: hidden;
+         max-height: 1em;
+     }
+     div {
+         max-height: 1em;
+     }
+     .chr {
+         max-width: 1ch;
+     }
+     pre {
+         line-height: 1em;
+     }
+    </style>
   </head>
   <body>
     <input id="file" type="file" />
@@ -15,6 +31,37 @@
      var output = document.getElementById('output');
      var decode = document.getElementById('decode');
      var file = document.getElementById('file');
+     // ------------------------------------------------------------------------
+     var format_ansi = function(string) {
+         // function ansi.html don't work on some Unicode characters on Windows 7
+         // this is workaroud together with css
+         var spans = ansi.format(function(styles, color, background, text) {
+             var style = [];
+             if (color) {
+                 style.push('color:' + color);
+             }
+             if (background) {
+                 style.push('background:' + background);
+             }
+             if (styles.bold) {
+                 style.push('font-weight:bold');
+             }
+             if (styles.italic) {
+                 style.push('font-style:italic');
+             }
+             if (styles.underline) {
+                 styles.push('text-decoration:underline');
+             }
+             text = Array.from(text).map(function(chr) {
+                 return '<span class="chr">' + chr + '</span>';
+             }).join('');
+             return '<span style="' + style.join(';') + '">' + text + '</span>';
+         }, string);
+         return spans.split(/\n/).map(function(line) {
+             return '<div>' + line + '</div>';
+         }).join('');
+     }
+     // ------------------------------------------------------------------------
      function format(input) {
          var str;
          if (typeof input === 'string') {
@@ -22,9 +69,11 @@
          } else {
              str = iconv.decode(Buffer.from(input), 'CP437');
          }
-         output.innerHTML = ansi.html(str);
+         output.innerHTML = format_ansi(str);
      }
+     // ------------------------------------------------------------------------
      fetch('FILE_ID.ANS').then(res => res.arrayBuffer()).then(format);
+     // ------------------------------------------------------------------------
      function load() {
          var reader = new FileReader();
          reader.onload = function(event) {

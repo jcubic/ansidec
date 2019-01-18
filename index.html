@@ -6,23 +6,38 @@
   </head>
   <body>
     <input id="file" type="file" />
+    <label for="decode">Decode CP437</label>
+    <input id="decode" type="checkbox" checked/>
     <pre id="output" style="background: black"></pre>
     <script src="index.js"></script>
     <script src="https://cdn.terminal.jcubic.pl/iconv.js"></script>
     <script>
      var output = document.getElementById('output');
-     function format(buff) {
-         var str = iconv.decode(Buffer.from(buff), 'CP437');
+     var decode = document.getElementById('decode');
+     var file = document.getElementById('file');
+     function format(input) {
+         var str;
+         if (typeof input === 'string') {
+             str = input;
+         } else {
+             str = iconv.decode(Buffer.from(input), 'CP437');
+         }
          output.innerHTML = ansi.html(str);
      }
      fetch('FILE_ID.ANS').then(res => res.arrayBuffer()).then(format);
-     document.querySelector('#file').addEventListener('change', function(event) {
+     function load() {
          var reader = new FileReader();
          reader.onload = function(event) {
              format(event.target.result);
          };
-         reader.readAsArrayBuffer(event.target.files[0]);
-     });
+         if (decode.checked) {
+             reader.readAsArrayBuffer(file.files[0]);
+         } else {
+             reader.readAsText(file.files[0]);
+         }
+     }
+     file.addEventListener('change', load);
+     decode.addEventListener('change', load);
   </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-VERSION=0.1.0
+VERSION=0.2.1
 CD=cd
 CAT=cat
 NPM=npm
@@ -47,5 +47,5 @@ lint:
 dist:
 	$(MKDIR) dist
 
-dist/ascidec.min.js: dist .$(VERSION)
+dist/ascidec.min.js: dist .$(VERSION) index.js
 	$(UGLIFY) -o dist/ascidec.min.js --comments --mangle --source-map "includeSources,url='ascidec.min.js.map'" -- index.js

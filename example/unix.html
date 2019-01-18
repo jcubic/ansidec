@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Client Decoding conversion</title>
+  </head>
+  <body>
+    <input id="file" type="file" />
+    <pre id="output" style="background: black"></pre>
+    <script src="../index.js"></script>
+    <script>
+     var output = document.getElementById('output');
+     function format(str) {
+         output.innerHTML = ansi.html(str);
+     }
+     fetch('unix.ans').then((res) => res.text()).then(format);
+     document.querySelector('#file').addEventListener('change', function(event) {
+         var reader = new FileReader();
+         reader.onload = function(event) {
+             format(event.target.result);
+         };
+         reader.readAsText(event.target.files[0]);
+     });
+  </script>
+  </body>
+</html>

@@ -7,8 +7,9 @@
  *  ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *  ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *  ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
+ * v. 0.2.1
  *
- * Copyright (c) 2018 Jakub Jankiewicz <https://jcubic.pl/me>
+ * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
  *
  * Based on jQuery Terminal's unix formatting
@@ -352,7 +353,7 @@
                         state.reverse = true;
                         break;
                     default:
-                        if (controls.indexOf('5') === -1) {
+                        if (controls[1] !== '5') {
                             if (color_list[num]) {
                                 output_color = color_list[num];
                             }
@@ -437,7 +438,7 @@
                 colors = ansi_colors.normal;
             }
             if (typeof output_color !== 'undefined') {
-                if (_ex_color) {
+                if (output_color.match(/^#/)) {
                     color = output_color;
                 } else if (output_color === 'inherit') {
                     color = output_color;
@@ -446,7 +447,7 @@
                 }
             }
             if (typeof output_background !== 'undefined') {
-                if (_ex_background) {
+                if (output_background.match(/^#/)) {
                     background = output_background;
                 } else if (output_background === 'transparent') {
                     background = output_background;
@@ -499,18 +500,15 @@
                 }
             }
             var code, match;
-            var inside = false;
             for (var i = 0; i < splitted.length; ++i) {
                 match = splitted[i].match(/^\x1B\[([0-9;]*)([A-Za-z])$/);
                 if (match) {
                     switch (match[2]) {
                         case 'm':
                             code = format_ansi(match[1], state);
-                            if (inside) {
-                                if (+match[1] !== 0) {
-                                    output.push(code);
-                                }
-                            } else if (+match[1] !== 0) {
+                            if (+match[1] === 0) {
+                                output.push(false);
+                            } else {
                                 output.push(code);
                             }
                             break;

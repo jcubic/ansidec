@@ -12,6 +12,9 @@
      div {
          max-height: 1em;
      }
+     .zoom {
+        transform: scale(1.4);
+     }
      .chr {
          max-width: 1ch;
      }
@@ -52,9 +55,18 @@
              if (styles.underline) {
                  styles.push('text-decoration:underline');
              }
+             var re = /[\u2580-\u25FF]/;
+             /*
+             var m = navigator.appVersion.match(/NT ([0-9]+)/);
+             var is_windows_fix_required = m && +m[1] < 10;
+             */
              text = Array.from(text).map(function(chr) {
-                 return '<span class="chr">' + chr + '</span>';
-             }).join('');
+                 var _class = "chr";
+                 if (re.test(chr)) {
+                     _class += ' zoom';
+                 }
+                 return '<span class="' + _class +'">' + chr + '</span>';
+              }).join('');
              return '<span style="' + style.join(';') + '">' + text + '</span>';
          }, string);
          return spans.split(/\n/).map(function(line) {

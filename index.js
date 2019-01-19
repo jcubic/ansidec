@@ -7,7 +7,7 @@
  *  ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *  ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *  ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.2.1
+ * v. 0.2.2
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
@@ -514,7 +514,7 @@
                             break;
                     }
                 } else {
-                    output.push(splitted[i]);
+                    output.push(splitted[i].replace(/\x1b\[[0-9;]*/g, ''));
                 }
             }
             var formatting;
@@ -565,6 +565,7 @@
         }, text);
     }
     return {
+        version: '0.2.2',
         format: format,
         html: html,
         colors: ansi_colors

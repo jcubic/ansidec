@@ -1,13 +1,13 @@
 /**@license
- *    ▄████████ ███▄▄▄▄      ▄████████  ▄█  ████████▄     ▄████████  ▄████████
- *  ███    ███ ███▀▀▀██▄   ███    ███ ███  ███   ▀███   ███    ███ ███    ███
- *  ███    ███ ███   ███   ███    █▀  ███▌ ███    ███   ███    █▀  ███    █▀
- *  ███    ███ ███   ███   ███        ███▌ ███    ███  ▄███▄▄▄     ███
+ *     ▄████████ ███▄▄▄▄      ▄████████  ▄█  ████████▄     ▄████████  ▄████████
+ *   ███    ███ ███▀▀▀██▄   ███    ███ ███  ███   ▀███   ███    ███ ███    ███
+ *   ███    ███ ███   ███   ███    █▀  ███▌ ███    ███   ███    █▀  ███    █▀
+ *   ███    ███ ███   ███   ███        ███▌ ███    ███  ▄███▄▄▄     ███
  * ▀███████████ ███   ███ ▀███████████ ███▌ ███    ███ ▀▀███▀▀▀     ███
- *  ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
- *  ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
- *  ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.2.2
+ *   ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
+ *   ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
+ *   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
+ * v. 0.3.0
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
@@ -40,7 +40,6 @@
                                    '(_)\\x08(' + chr + '))');
     var new_line_re = /^(\r\n|\n\r|\r|\n)/;
     var clear_line_re = /[^\r\n]+\r\x1B\[K/g;
-    // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     // :: Replace overtyping (from man) formatting with terminal formatting
     // :: it also handle any backspaces
@@ -535,6 +534,7 @@
             }, '');
         };
     })();
+    // -------------------------------------------------------------------------
     function format(callback, text) {
         if (text === undefined) {
             return function(text) {
@@ -543,6 +543,7 @@
         }
         return from_ansi(callback, overtyping(callback, text));
     }
+    // -------------------------------------------------------------------------
     function html(text) {
         return format(function(styles, color, background, text) {
             var style = [];
@@ -564,8 +565,71 @@
             return '<span style="' + style.join(';') + '">' + text + '</span>';
         }, text);
     }
+    // -------------------------------------------------------------------------
+    // :: SAUSE parser
+    // :: http://www.acid.org/info/sauce/sauce.htm
+    // -------------------------------------------------------------------------
+    function int(chr) {
+        if (chr.length == 1) {
+            return chr.charCodeAt(0);
+        }
+        var hex = Array.from(chr).map(function(x) {
+            return x.charCodeAt(0).toString(16).padStart(2, '0');
+        }).reverse().join('');
+        return parseInt(hex, 16);
+    }
+    // -------------------------------------------------------------------------
+    function sause(str) {
+        var offset = 0;
+        var sauce = str.substring(str.length - 128);
+        function read(len, type) {
+            if (offset <= sauce.length + len) {
+                var result = sauce.substring(offset, offset + len);
+                offset += len;
+                if (type === 'string') {
+                    return result.replace(/\x00+$/g, '');
+                }
+                return result;
+            }
+        }
+        var id = read(5);
+        if (id == 'SAUCE') {
+            var result = {};
+            result.ID = id;
+            result.version = read(2);
+            result.title = read(35).trim();
+            result.author = read(20).trim();
+            result.group = read(20).trim();
+            result.date = read(8);
+            result.fileSize = int(read(4));
+            result.dataType = int(read(1));
+            result.fileType = int(read(1));
+            var tinfo = [];
+            for (var i = 0; i < 4; ++i) {
+                if (offset < sauce.length) {
+                    tinfo.push(int(read(2)));
+                }
+            }
+            result.tinfo = tinfo;
+            if (offset < sauce.length) {
+              var lines = int(read(1));
+              if (lines > 0) {
+                result.comments = read(lines * 64);
+              }
+            }
+            if (offset < sauce.length) {
+                result.tflags = read(1);
+            }
+            if (offset < sauce.length) {
+                result.zstring = read(22, 'string');
+            }
+            return result;
+        }
+    }
+    // -------------------------------------------------------------------------
     return {
-        version: '0.2.2',
+        version: '0.3.0',
+        meta: sause,
         format: format,
         html: html,
         colors: ansi_colors

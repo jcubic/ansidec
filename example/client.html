@@ -3,16 +3,44 @@
   <head>
     <meta charset="utf-8"/>
     <title>Client Decoding conversion</title>
+    <style>
+    #output {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+</style>
   </head>
   <body>
     <input id="file" type="file" />
     <pre id="output" style="background: black"></pre>
     <script src="../index.js"></script>
-    <script src="https://cdn.terminal.jcubic.pl/iconv.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/iconv.js"></script>
     <script>
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        targetLength = targetLength >> 0; //truncate if number, or convert non-number to 0;
+        padString = String(typeof padString !== 'undefined' ? padString : ' ');
+        if (this.length >= targetLength) {
+            return String(this);
+        } else {
+            targetLength = targetLength - this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0, targetLength) + String(this);
+        }
+    };
+}
      var output = document.getElementById('output');
      function format(buff) {
-         var str = iconv.decode(Buffer.from(buff), 'CP437');
+         var b = Buffer.from(buff);
+         var str = iconv.decode(b, 'CP437');
+         var sause = ansi.parse_meta(str);
+         if (sause) {
+            output.style.width = sause.tinfo[0] + 'ch';
+            console.log(sause);
+            str = str.substring(0, str.length - 128);
+         }
          output.innerHTML = ansi.html(str);
      }
      fetch('FILE_ID.ANS').then(res => res.arrayBuffer()).then(format);

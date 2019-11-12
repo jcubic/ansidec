@@ -17,7 +17,8 @@
 /* global global, it, expect, describe, require, spyOn, setTimeout, location,
           beforeEach, afterEach, jest */
 var ansi = require('..');
-
+var fs = require('fs');
+var iconv = require('iconv-lite');
 
 
 describe('overtyping', function() {
@@ -98,5 +99,38 @@ describe('ansi', function() {
         var input = 'foo bar';
         var output = from_ansi(input);
         expect(output).toEqual(input);
+    });
+});
+describe('meta', function() {
+    it('should parse SAUSE meta data', function() {
+        var meta = {
+            "ID": "SAUCE",
+            "version": "00",
+            "title": "Regina Pacis",
+            "author": "burps",
+            "group": "fuel",
+            "date": "20180923",
+            "fileSize": 22630,
+            "dataType": 1,
+            "fileType": 1,
+            "tinfo": [
+                80,
+                231,
+                0,
+                0
+            ],
+            "tflags": "\u0012",
+            "zstring": "IBM VGA"
+        };
+        return new Promise(function(resolve, reject) {
+            fs.readFile('example/bs-pacis.ans', function(err, data) {
+                if (err) {
+                    return reject(err);
+                }
+                var str = iconv.decode(data, 'CP437');
+                expect(ansi.meta(str)).toEqual(meta);
+                resolve();
+            });
+        });
     });
 });

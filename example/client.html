@@ -35,11 +35,12 @@ if (!String.prototype.padStart) {
      function format(buff) {
          var b = Buffer.from(buff);
          var str = iconv.decode(b, 'CP437');
-         var sause = ansi.parse_meta(str);
+         var sause = ansi.meta(str);
          if (sause) {
             output.style.width = sause.tinfo[0] + 'ch';
             console.log(sause);
             str = str.substring(0, str.length - 128);
+             console.log(ansi.meta(b.toString()));
          }
          output.innerHTML = ansi.html(str);
      }

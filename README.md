@@ -120,6 +120,13 @@ meta object have those properties (description in SAUSE specification linked abo
 }
 ```
 
+### Changelog
+
+* 0.3.0 - parsing sause meta
+* 0.2.1 - bump up version for npm
+* 0.2.0 - fix 8 bit colors (Denis Ritchie)
+* 0.1.0 - first version
+
 ### License
 
 Released under [MIT](http://opensource.org/licenses/MIT) license

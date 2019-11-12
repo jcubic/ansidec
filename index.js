@@ -15,7 +15,7 @@
  * Based on jQuery Terminal's unix formatting
  *
  */
-/* global jQuery, define, global, require, module */
+/* global define, global, module */
 (function(factory) {
     var root = typeof window !== 'undefined' ? window : global;
     if (typeof define === 'function' && define.amd) {
@@ -570,7 +570,7 @@
     // :: http://www.acid.org/info/sauce/sauce.htm
     // -------------------------------------------------------------------------
     function int(chr) {
-        if (chr.length == 1) {
+        if (chr.length === 1) {
             return chr.charCodeAt(0);
         }
         var hex = Array.from(chr).map(function(x) {
@@ -593,7 +593,7 @@
             }
         }
         var id = read(5);
-        if (id == 'SAUCE') {
+        if (id === 'SAUCE') {
             var result = {};
             result.ID = id;
             result.version = read(2);
@@ -612,10 +612,10 @@
             }
             result.tinfo = tinfo;
             if (offset < sauce.length) {
-              var lines = int(read(1));
-              if (lines > 0) {
-                result.comments = read(lines * 64);
-              }
+                var lines = int(read(1));
+                if (lines > 0) {
+                    result.comments = read(lines * 64);
+                }
             }
             if (offset < sauce.length) {
                 result.tflags = read(1);

@@ -9,7 +9,7 @@
   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
 ```
 
-[![npm](https://img.shields.io/badge/npm-0.2.1-blue.svg)](https://www.npmjs.com/package/ansidec)
+[![npm](https://img.shields.io/badge/npm-0.3.0-blue.svg)](https://www.npmjs.com/package/ansidec)
 [![travis](https://travis-ci.org/jcubic/ansidec.svg?branch=master)](https://travis-ci.org/jcubic/ansidec)
 [![Coverage Status](https://coveralls.io/repos/github/jcubic/ansidec/badge.svg?branch=master)](https://coveralls.io/github/jcubic/ansidec?branch=master)
 [![MIT badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jcubic/jquery.terminal/blob/master/LICENSE)
@@ -76,9 +76,8 @@ If you want just to output html you can use helper:
 
 ```javascript
 var ansi = require('ansidec');
-
-document.querySelector('pre').innerHTML = ansi.html(text)
-
+var output = document.querySelector('pre');
+output.innerHTML = ansi.html(text)
 ```
 
 and use format only if you need different html or any different output text.
@@ -90,6 +89,43 @@ ANSI art file to UTF-8 to do that you can use iconv-lite library or iconv on a B
 see how to do that in
 [examples directory](https://github.com/jcubic/ansidec/tree/master/example).
 
+Some ANSI art are 80 characters wide but some have meta data called
+[SAUSE](http://www.acid.org/info/sauce/sauce.htm). You can read those data
+using `ansi.meta` function:
+
+```javascript
+var sause = ansi.meta(text);
+if (sause) {
+  var chars = sause.tinfo[0];
+  // note that ch unit don't work properly in IE
+  output.style.width = chars + 'ch';
+}
+```
+
+meta object have those properties (description in SAUSE specification linked above).
+
+```typescript
+{
+  id: 'SAUSE',
+  version: string,
+  title: string,
+  author: string,
+  group: string,
+  date: string,
+  fileSize: number,
+  tinfo: number[],
+  comments: string,
+  tflags: string,
+  zstring: string
+}
+```
+
+### Changelog
+
+* 0.3.0 - parsing sause meta
+* 0.2.1 - bump up version for npm
+* 0.2.0 - fix 8 bit colors (Denis Ritchie)
+* 0.1.0 - first version
 
 ### License
 

@@ -1,6 +1,6 @@
 {
   "name": "ansidec",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Limited Unix ANSI escape sequences transformer for use in Browsers",
   "main": "index.js",
   "unpkg": "dist/ascidec.min.js",
@@ -195,7 +195,8 @@
   "devDependencies": {
     "coveralls": "^3.0.2",
     "eslint": "^5.9.0",
-    "jest": "^23.6.0",
+    "iconv-lite": "^0.5.0",
+    "jest": "^25.0.0",
     "uglify-js": "^3.4.9"
   }
 }

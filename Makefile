@@ -1,4 +1,4 @@
-VERSION=0.2.1
+VERSION=0.3.0
 CD=cd
 CAT=cat
 NPM=npm

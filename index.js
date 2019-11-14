@@ -7,7 +7,7 @@
  *   ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *   ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.3.0
+ * v. 0.3.1
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
@@ -318,6 +318,8 @@
                         Object.keys(state).forEach(function(key) {
                             delete state[key];
                         });
+                        state.bold = false;
+                        state.faited = false;
                         break;
                     case 1:
                         styles.bold = state.bold = true;
@@ -498,17 +500,23 @@
                     splitted = splitted.slice(3);
                 }
             }
-            var code, match;
+            var code, match, inside = false;
             for (var i = 0; i < splitted.length; ++i) {
                 match = splitted[i].match(/^\x1B\[([0-9;]*)([A-Za-z])$/);
                 if (match) {
                     switch (match[2]) {
                         case 'm':
                             code = format_ansi(match[1], state);
-                            if (+match[1] === 0) {
-                                output.push(false);
-                            } else {
+                            if (inside) {
+                                if (+match[1] === 0) {
+                                    inside = false;
+                                    output.push(false);
+                                } else {
+                                    output.push(code);
+                                }
+                            } else if (+match[1] !== 0) {
                                 output.push(code);
+                                inside = true;
                             }
                             break;
                     }
@@ -580,8 +588,6 @@
     }
     // -------------------------------------------------------------------------
     function sause(str) {
-        var offset = 0;
-        var sauce = str.substring(str.length - 128);
         function read(len, type) {
             if (offset <= sauce.length + len) {
                 var result = sauce.substring(offset, offset + len);
@@ -592,10 +598,9 @@
                 return result;
             }
         }
-        var id = read(5);
-        if (id === 'SAUCE') {
+        function parse() {
             var result = {};
-            result.ID = id;
+            result.ID = read(5);
             result.version = read(2);
             result.title = read(35).trim();
             result.author = read(20).trim();
@@ -625,10 +630,21 @@
             }
             return result;
         }
+        var offset = 0;
+        var sauce = str.substring(str.length - 128);
+        if (sauce.match(/^SAUCE/)) {
+            return parse();
+        } else if (str.match(/\x1ASAUCE/)) {
+            // there is something at the end but don't match the spec
+            // some ANSI art meta data are shorter
+            offset = 0;
+            sauce = str.replace(/^[\s\S]+\x1A/, '');
+            return parse();
+        }
     }
     // -------------------------------------------------------------------------
     return {
-        version: '0.3.0',
+        version: '0.3.1',
         meta: sause,
         format: format,
         html: html,

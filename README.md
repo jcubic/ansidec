@@ -9,7 +9,7 @@
   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
 ```
 
-[![npm](https://img.shields.io/badge/npm-0.3.1-blue.svg)](https://www.npmjs.com/package/ansidec)
+[![npm](https://img.shields.io/badge/npm-0.3.2-blue.svg)](https://www.npmjs.com/package/ansidec)
 [![travis](https://travis-ci.org/jcubic/ansidec.svg?branch=master)](https://travis-ci.org/jcubic/ansidec)
 [![Coverage Status](https://coveralls.io/repos/github/jcubic/ansidec/badge.svg?branch=master)](https://coveralls.io/github/jcubic/ansidec?branch=master)
 [![MIT badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jcubic/jquery.terminal/blob/master/LICENSE)
@@ -121,6 +121,7 @@ meta object have those properties (description in SAUSE specification linked abo
 ```
 
 ### Changelog
+* 0.3.2 - proper parsing of SAUCE comments
 * 0.3.1 - alternative SAUCE extraction
 * 0.3.0 - parsing SAUCE meta
 * 0.2.1 - bump up version for npm

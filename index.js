@@ -7,7 +7,7 @@
  *   ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *   ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.3.1
+ * v. 0.3.2
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
@@ -616,11 +616,9 @@
                 }
             }
             result.tinfo = tinfo;
+            var comments;
             if (offset < sauce.length) {
-                var lines = int(read(1));
-                if (lines > 0) {
-                    result.comments = read(lines * 64);
-                }
+                result.comments = int(read(1));
             }
             if (offset < sauce.length) {
                 result.tflags = read(1);
@@ -633,18 +631,31 @@
         var offset = 0;
         var sauce = str.substring(str.length - 128);
         if (sauce.match(/^SAUCE/)) {
-            return parse();
-        } else if (str.match(/\x1ASAUCE/)) {
+            var result = parse();
+            var comments = [];
+            if (result.comments > 0) {
+                // we reuse our sauce read function for comments
+                // they are before SAUCE data
+                sauce = str;
+                offset = str.length - 128 - (result.comments * 64) - 5;
+                if (read(5) === 'COMNT') {
+                    for (var i = 0; i < result.comments; i++) {
+                        comments.push(read(64, 'string').trim());
+                    }
+                }
+            }
+            result.comments = comments;
+            return result;
+        } else if (sauce.match(/\x1ASAUCE/)) {
             // there is something at the end but don't match the spec
             // some ANSI art meta data are shorter
-            offset = 0;
             sauce = str.replace(/^[\s\S]+\x1A/, '');
             return parse();
         }
     }
     // -------------------------------------------------------------------------
     return {
-        version: '0.3.1',
+        version: '0.3.2',
         meta: sause,
         format: format,
         html: html,

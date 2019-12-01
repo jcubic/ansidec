@@ -104,22 +104,22 @@ describe('ansi', function() {
 describe('meta', function() {
     it('should parse SAUSE meta data', function() {
         var meta = {
-            "ID": "SAUCE",
             "version": "00",
             "title": "Regina Pacis",
+            "comments": [],
             "author": "burps",
             "group": "fuel",
             "date": "20180923",
             "fileSize": 22630,
             "dataType": 1,
             "fileType": 1,
-            "tinfo": [
+            "tInfo": [
                 80,
-                231,
+                135,
                 0,
                 0
             ],
-            "tflags": "\u0012",
+            "flags": 18,
             "zstring": "IBM VGA"
         };
         return new Promise(function(resolve, reject) {
@@ -127,8 +127,8 @@ describe('meta', function() {
                 if (err) {
                     return reject(err);
                 }
-                var str = iconv.decode(data, 'CP437');
-                expect(ansi.meta(str)).toEqual(meta);
+                //var str = iconv.decode(data, 'CP437');
+                expect(ansi.meta(data)).toEqual(meta);
                 resolve();
             });
         });

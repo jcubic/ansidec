@@ -7,30 +7,34 @@
  *   ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *   ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.3.2
+ * v. 0.3.3
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
  *
+ * Contains: SAUCE parser from ansilove.js MIT license
+ *
  * Based on jQuery Terminal's unix formatting
  *
  */
-/* global define, global, module */
+/* global define, global, module, require */
 (function(factory) {
     var root = typeof window !== 'undefined' ? window : global;
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         // istanbul ignore next
-        define([], factory);
+        define([], function() {
+            factory(window.TextEncoder);
+        });
     } else if (typeof module === 'object' && module.exports) {
         // Node/CommonJS
-        module.exports = factory();
+        module.exports = factory(require('util').TextEncoder);
     } else {
         // Browser
         // istanbul ignore next
-        root.ansi = factory();
+        root.ansi = factory(window.TextEncoder);
     }
-})(function(undefined) {
+})(function(TextEncoder, undefined) {
     // we match characters and html entities because command line escape brackets
     // echo don't, when writing formatter always process html entitites so it work
     // for cmd plugin as well for echo
@@ -574,88 +578,231 @@
         }, text);
     }
     // -------------------------------------------------------------------------
-    // :: SAUSE parser
-    // :: http://www.acid.org/info/sauce/sauce.htm
+    // :: ref: https://stackoverflow.com/a/18729931/387194
     // -------------------------------------------------------------------------
-    function int(chr) {
-        if (chr.length === 1) {
-            return chr.charCodeAt(0);
+    function toUTF8Array(str) {
+        var utf8 = [];
+        for (var i=0; i < str.length; i++) {
+            var charcode = str.charCodeAt(i);
+            if (charcode < 0x80) utf8.push(charcode);
+            else if (charcode < 0x800) {
+                utf8.push(0xc0 | (charcode >> 6),
+                          0x80 | (charcode & 0x3f));
+            }
+            else if (charcode < 0xd800 || charcode >= 0xe000) {
+                utf8.push(0xe0 | (charcode >> 12),
+                          0x80 | ((charcode>>6) & 0x3f),
+                          0x80 | (charcode & 0x3f));
+            }
+            // surrogate pair
+            else {
+                i++;
+                // UTF-16 encodes 0x10000-0x10FFFF by
+                // subtracting 0x10000 and splitting the
+                // 20 bits of 0x0-0xFFFFF into two halves
+                charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                          | (str.charCodeAt(i) & 0x3ff));
+                utf8.push(0xf0 | (charcode >>18),
+                          0x80 | ((charcode>>12) & 0x3f),
+                          0x80 | ((charcode>>6) & 0x3f),
+                          0x80 | (charcode & 0x3f));
+            }
         }
-        var hex = Array.from(chr).map(function(x) {
-            return x.charCodeAt(0).toString(16).padStart(2, '0');
-        }).reverse().join('');
-        return parseInt(hex, 16);
+        return utf8;
     }
     // -------------------------------------------------------------------------
-    function sause(str) {
-        function read(len, type) {
-            if (offset <= sauce.length + len) {
-                var result = sauce.substring(offset, offset + len);
-                offset += len;
-                if (type === 'string') {
-                    return result.replace(/\x00+$/g, '');
+    // :: SAUSE parser
+    // :: http://www.acid.org/info/sauce/sauce.htm
+    // :: source: https://github.com/nvdnkpr/ansilove.js
+    // -------------------------------------------------------------------------
+    // This function returns an object that emulates basic file-handling when
+    // fed an array of bytes.
+    // -------------------------------------------------------------------------
+    function File(bytes) {
+        // pos points to the current position in the 'file'. SAUCE_ID, COMNT_ID,
+        // and commentCount are used later when parsing the SAUCE record.
+        var pos, SAUCE_ID, COMNT_ID, commentCount;
+
+        // Raw Bytes for "SAUCE" and "COMNT", used when parsing SAUCE records.
+        SAUCE_ID = new Uint8Array([0x53, 0x41, 0x55, 0x43, 0x45]);
+        COMNT_ID = new Uint8Array([0x43, 0x4F, 0x4D, 0x4E, 0x54]);
+
+        // Returns an 8-bit byte at the current byte position, <pos>. Also
+        // advances <pos> by a single byte. Throws an error if we advance beyond
+        // the length of the array.
+        this.get = function () {
+            if (pos >= bytes.length) {
+                throw "Unexpected end of file reached.";
+            }
+            return bytes[pos++];
+        };
+
+        // Same as get(), but returns a 16-bit byte. Also advances <pos>
+        // by two (8-bit) bytes.
+        this.get16 = function () {
+            var v;
+            v = this.get();
+            return v + (this.get() << 8);
+        };
+
+        // Same as get(), but returns a 32-bit byte. Also advances <pos>
+        // by four (8-bit) bytes.
+        this.get32 = function () {
+            var v;
+            v = this.get();
+            v += this.get() << 8;
+            v += this.get() << 16;
+            return v + (this.get() << 24);
+        };
+
+        // Exactly the same as get(), but returns a character symbol,
+        // instead of the value. e.g. 65 = "A".
+        this.getC = function () {
+            return String.fromCharCode(this.get());
+        };
+
+        // Returns a string of <num> characters at the current file position,
+        // and strips the trailing whitespace characters.
+        // Advances <pos> by <num> by calling getC().
+        this.getS = function (num) {
+            var string;
+            string = "";
+            while (num-- > 0) {
+                string += this.getC();
+            }
+            return string.replace(/[\x00\s]+$/, '');
+        };
+
+        // Returns "true" if, at the current <pos>, a string of characters
+        // matches <match>. Does not increment <pos>.
+        this.lookahead = function (match) {
+            var i;
+            for (i = 0; i < match.length; ++i) {
+                if ((pos + i === bytes.length) || (bytes[pos + i] !== match[i])) {
+                    break;
                 }
-                return result;
             }
-        }
-        function parse() {
-            var result = {};
-            result.ID = read(5);
-            result.version = read(2);
-            result.title = read(35).trim();
-            result.author = read(20).trim();
-            result.group = read(20).trim();
-            result.date = read(8);
-            result.fileSize = int(read(4));
-            result.dataType = int(read(1));
-            result.fileType = int(read(1));
-            var tinfo = [];
-            for (var i = 0; i < 4; ++i) {
-                if (offset < sauce.length) {
-                    tinfo.push(int(read(2)));
+            return i === match.length;
+        };
+
+        // Returns an array of <num> bytes found at the current <pos>. Also
+        // increments <pos>.
+        this.read = function (num) {
+            var t;
+            t = pos;
+            // If num is undefined, return all the bytes until the end of file.
+            num = num || this.size - pos;
+            while (++pos < this.size) {
+                if (--num === 0) {
+                    break;
                 }
             }
-            result.tinfo = tinfo;
-            var comments;
-            if (offset < sauce.length) {
-                result.comments = int(read(1));
-            }
-            if (offset < sauce.length) {
-                result.tflags = read(1);
-            }
-            if (offset < sauce.length) {
-                result.zstring = read(22, 'string');
-            }
-            return result;
-        }
-        var offset = 0;
-        var sauce = str.substring(str.length - 128);
-        if (sauce.match(/^SAUCE/)) {
-            var result = parse();
-            var comments = [];
-            if (result.comments > 0) {
-                // we reuse our sauce read function for comments
-                // they are before SAUCE data
-                sauce = str;
-                offset = str.length - 128 - (result.comments * 64) - 5;
-                if (read(5) === 'COMNT') {
-                    for (var i = 0; i < result.comments; i++) {
-                        comments.push(read(64, 'string').trim());
+            return bytes.subarray(t, pos);
+        };
+
+        // Sets a new value for <pos>. Equivalent to seeking a file to a new position.
+        this.seek = function (newPos) {
+            pos = newPos;
+        };
+
+        // Returns the value found at <pos>, without incrementing <pos>.
+        this.peek = function (num) {
+            num = num || 0;
+            return bytes[pos + num];
+        };
+
+        // Returns the the current position being read in the file, in amount
+        // of bytes. i.e. <pos>.
+        this.getPos = function () {
+            return pos;
+        };
+
+        // Returns true if the end of file has been reached. <this.size> is set
+        // later by the SAUCE parsing section, as it is not always the same
+        // value as the length of <bytes>. (In case there is a SAUCE record,
+        // and optional comments).
+        this.eof = function () {
+            return pos === this.size;
+        };
+
+        // Seek to the position we would expect to find a SAUCE record.
+        pos = bytes.length - 128;
+        // If we find "SAUCE".
+        if (this.lookahead(SAUCE_ID)) {
+            this.sauce = {};
+            // Read "SAUCE".
+            this.getS(5);
+            // Read and store the various SAUCE values.
+            this.sauce.version = this.getS(2); // String, maximum of 2 characters
+            this.sauce.title = this.getS(35); // String, maximum of 35 characters
+            this.sauce.author = this.getS(20); // String, maximum of 20 characters
+            this.sauce.group = this.getS(20); // String, maximum of 20 characters
+            this.sauce.date = this.getS(8); // String, maximum of 8 characters
+            this.sauce.fileSize = this.get32(); // unsigned 32-bit
+            this.sauce.dataType = this.get(); // unsigned 8-bit
+            this.sauce.fileType = this.get(); // unsigned 8-bit
+            this.sauce.tInfo = [];
+            this.sauce.tInfo.push(this.get16()); // unsigned 16-bit
+            this.sauce.tInfo.push(this.get16()); // unsigned 16-bit
+            this.sauce.tInfo.push(this.get16()); // unsigned 16-bit
+            this.sauce.tInfo.push(this.get16()); // unsigned 16-bit
+            // Initialize the comments array.
+            this.sauce.comments = [];
+            commentCount = this.get(); // unsigned 8-bit
+            this.sauce.flags = this.get(); // unsigned 8-bit
+            this.sauce.zstring = this.getS(22);
+            if (commentCount > 0) {
+                // If we have a value for the comments amount, seek to the position
+                // we'd expect to find them...
+                pos = bytes.length - 128 - (commentCount * 64) - 5;
+                // ... and check that we find a COMNT header.
+                if (this.lookahead(COMNT_ID)) {
+                    // Read COMNT ...
+                    this.getS(5);
+                    // ... and push everything we find after that into
+                    // our <this.sauce.comments> array, in 64-byte chunks,
+                    // stripping the trailing whitespace in the getS() function.
+                    while (commentCount-- > 0) {
+                        this.sauce.comments.push(this.getS(64));
                     }
                 }
             }
-            result.comments = comments;
-            return result;
-        } else if (sauce.match(/\x1ASAUCE/)) {
-            // there is something at the end but don't match the spec
-            // some ANSI art meta data are shorter
-            sauce = str.replace(/^[\s\S]+\x1A/, '');
-            return parse();
+        }
+        // Seek back to the start of the file, ready for reading.
+        pos = 0;
+
+        if (this.sauce) {
+            // If we have found a SAUCE record, and the fileSize field passes
+            // some basic sanity checks...
+            if (this.sauce.fileSize > 0 && this.sauce.fileSize < bytes.length) {
+                // Set <this.size> to the value set in SAUCE.
+                this.size = this.sauce.fileSize;
+            } else {
+                // If it fails the sanity checks, just assume that SAUCE record
+                // can't be trusted, and set <this.size> to the position
+                // where the SAUCE record begins.
+                this.size = bytes.length - 128;
+            }
+        } else {
+            // If there is no SAUCE record, assume that everything
+            // in <bytes> relates to an image.
+            this.size = bytes.length;
         }
     }
     // -------------------------------------------------------------------------
+    function sause(arg) {
+        var uint_a;
+        if (typeof arg === 'string') {
+            uint_a = new Uint8Array(new TextEncoder('utf8').encode(arg));
+        } else {
+            uint_a = arg;
+        }
+        var f = new File(uint_a);
+        return f.sauce;
+    }
+    // -------------------------------------------------------------------------
     return {
-        version: '0.3.2',
+        version: '0.3.3',
         meta: sause,
         format: format,
         html: html,

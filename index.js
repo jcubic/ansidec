@@ -17,7 +17,7 @@
  * Based on jQuery Terminal's unix formatting
  *
  */
-/* global define, global, module, require */
+/* global define, global, module, require, Uint8Array */
 (function(factory) {
     var root = typeof window !== 'undefined' ? window : global;
     if (typeof define === 'function' && define.amd) {
@@ -578,39 +578,6 @@
         }, text);
     }
     // -------------------------------------------------------------------------
-    // :: ref: https://stackoverflow.com/a/18729931/387194
-    // -------------------------------------------------------------------------
-    function toUTF8Array(str) {
-        var utf8 = [];
-        for (var i=0; i < str.length; i++) {
-            var charcode = str.charCodeAt(i);
-            if (charcode < 0x80) utf8.push(charcode);
-            else if (charcode < 0x800) {
-                utf8.push(0xc0 | (charcode >> 6),
-                          0x80 | (charcode & 0x3f));
-            }
-            else if (charcode < 0xd800 || charcode >= 0xe000) {
-                utf8.push(0xe0 | (charcode >> 12),
-                          0x80 | ((charcode>>6) & 0x3f),
-                          0x80 | (charcode & 0x3f));
-            }
-            // surrogate pair
-            else {
-                i++;
-                // UTF-16 encodes 0x10000-0x10FFFF by
-                // subtracting 0x10000 and splitting the
-                // 20 bits of 0x0-0xFFFFF into two halves
-                charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-                          | (str.charCodeAt(i) & 0x3ff));
-                utf8.push(0xf0 | (charcode >>18),
-                          0x80 | ((charcode>>12) & 0x3f),
-                          0x80 | ((charcode>>6) & 0x3f),
-                          0x80 | (charcode & 0x3f));
-            }
-        }
-        return utf8;
-    }
-    // -------------------------------------------------------------------------
     // :: SAUSE parser
     // :: http://www.acid.org/info/sauce/sauce.htm
     // :: source: https://github.com/nvdnkpr/ansilove.js
@@ -630,16 +597,16 @@
         // Returns an 8-bit byte at the current byte position, <pos>. Also
         // advances <pos> by a single byte. Throws an error if we advance beyond
         // the length of the array.
-        this.get = function () {
+        this.get = function() {
             if (pos >= bytes.length) {
-                throw "Unexpected end of file reached.";
+                throw new Error("Unexpected end of file reached.");
             }
             return bytes[pos++];
         };
 
         // Same as get(), but returns a 16-bit byte. Also advances <pos>
         // by two (8-bit) bytes.
-        this.get16 = function () {
+        this.get16 = function() {
             var v;
             v = this.get();
             return v + (this.get() << 8);
@@ -647,7 +614,7 @@
 
         // Same as get(), but returns a 32-bit byte. Also advances <pos>
         // by four (8-bit) bytes.
-        this.get32 = function () {
+        this.get32 = function() {
             var v;
             v = this.get();
             v += this.get() << 8;
@@ -657,14 +624,14 @@
 
         // Exactly the same as get(), but returns a character symbol,
         // instead of the value. e.g. 65 = "A".
-        this.getC = function () {
+        this.getC = function() {
             return String.fromCharCode(this.get());
         };
 
         // Returns a string of <num> characters at the current file position,
         // and strips the trailing whitespace characters.
         // Advances <pos> by <num> by calling getC().
-        this.getS = function (num) {
+        this.getS = function(num) {
             var string;
             string = "";
             while (num-- > 0) {
@@ -675,7 +642,7 @@
 
         // Returns "true" if, at the current <pos>, a string of characters
         // matches <match>. Does not increment <pos>.
-        this.lookahead = function (match) {
+        this.lookahead = function(match) {
             var i;
             for (i = 0; i < match.length; ++i) {
                 if ((pos + i === bytes.length) || (bytes[pos + i] !== match[i])) {
@@ -687,7 +654,7 @@
 
         // Returns an array of <num> bytes found at the current <pos>. Also
         // increments <pos>.
-        this.read = function (num) {
+        this.read = function(num) {
             var t;
             t = pos;
             // If num is undefined, return all the bytes until the end of file.
@@ -701,19 +668,19 @@
         };
 
         // Sets a new value for <pos>. Equivalent to seeking a file to a new position.
-        this.seek = function (newPos) {
+        this.seek = function(newPos) {
             pos = newPos;
         };
 
         // Returns the value found at <pos>, without incrementing <pos>.
-        this.peek = function (num) {
+        this.peek = function(num) {
             num = num || 0;
             return bytes[pos + num];
         };
 
         // Returns the the current position being read in the file, in amount
         // of bytes. i.e. <pos>.
-        this.getPos = function () {
+        this.getPos = function() {
             return pos;
         };
 
@@ -721,7 +688,7 @@
         // later by the SAUCE parsing section, as it is not always the same
         // value as the length of <bytes>. (In case there is a SAUCE record,
         // and optional comments).
-        this.eof = function () {
+        this.eof = function() {
             return pos === this.size;
         };
 

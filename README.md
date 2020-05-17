@@ -9,7 +9,7 @@
   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
 ```
 
-[![npm](https://img.shields.io/badge/npm-0.3.3-blue.svg)](https://www.npmjs.com/package/ansidec)
+[![npm](https://img.shields.io/badge/npm-0.3.4-blue.svg)](https://www.npmjs.com/package/ansidec)
 [![travis](https://travis-ci.org/jcubic/ansidec.svg?branch=master)](https://travis-ci.org/jcubic/ansidec)
 [![Coverage Status](https://coveralls.io/repos/github/jcubic/ansidec/badge.svg?branch=master)](https://coveralls.io/github/jcubic/ansidec?branch=master)
 [![MIT badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jcubic/jquery.terminal/blob/master/LICENSE)
@@ -134,4 +134,4 @@ meta object have those properties (description in SAUSE specification linked abo
 
 Released under [MIT](http://opensource.org/licenses/MIT) license
 
-Copyright (c) 2018-2019 [Jakub T. Jankiewicz](https://jcubic.pl/)
+Copyright (c) 2018-2020 [Jakub T. Jankiewicz](https://jcubic.pl/)

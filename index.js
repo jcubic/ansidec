@@ -644,7 +644,7 @@
         // matches <match>. Does not increment <pos>.
         this.lookahead = function(match) {
             if (SAUCE_ID === match) {
-                debugger;
+                //debugger;
             }
             var i;
             for (i = 0; i < match.length; ++i) {

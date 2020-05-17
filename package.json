@@ -7,7 +7,7 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jcubic/ascidec.git"
+    "url": "git+https://github.com/jcubic/ansidec.git"
   },
   "keywords": [
     "ansi",
@@ -21,9 +21,9 @@
   "author": "Jakub Jankiewicz <jcubic@onet.pl> (https://jcubic.pl/jakub-jankiewicz/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jcubic/ascidec/issues"
+    "url": "https://github.com/jcubic/ansidec/issues"
   },
-  "homepage": "https://github.com/jcubic/ascidec#readme",
+  "homepage": "https://github.com/jcubic/ansidec#readme",
   "eslintConfig": {
     "parserOptions": {
       "ecmaVersion": 3,

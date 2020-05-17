@@ -90,30 +90,30 @@ see how to do that in
 [examples directory](https://github.com/jcubic/ansidec/tree/master/example).
 
 Some ANSI art are 80 characters wide but some have meta data called
-[SAUSE](http://www.acid.org/info/sauce/sauce.htm). You can read those data
+[SAUCE](http://www.acid.org/info/sauce/sauce.htm). You can read those data
 using `ansi.meta` function:
 
 ```javascript
-var sause = ansi.meta(text);
-if (sause) {
-  var chars = sause.tinfo[0];
+var sauce = ansi.meta(text);
+if (sauce) {
+  var chars = sauce.tInfo[0];
   // note that ch unit don't work properly in IE
   output.style.width = chars + 'ch';
 }
 ```
 
-meta object have those properties (description in SAUSE specification linked above).
+meta object have those properties (description in SAUCE specification linked above).
 
 ```typescript
 {
-  id: 'SAUSE',
+  id: 'SAUCE',
   version: string,
   title: string,
   author: string,
   group: string,
   date: string,
   fileSize: number,
-  tinfo: number[],
+  tInfo: number[],
   comments: string,
   tflags: string,
   zstring: string

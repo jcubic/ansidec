@@ -121,6 +121,7 @@ meta object have those properties (description in SAUSE specification linked abo
 ```
 
 ### Changelog
+* 0.3.4 - fix GitHub url in README for npm
 * 0.3.3 - parse zstring from SAUCE + fixes to match unit tests
 * 0.3.2 - proper parsing of SAUCE comments
 * 0.3.1 - alternative SAUCE extraction

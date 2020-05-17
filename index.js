@@ -7,7 +7,7 @@
  *   ███    ███ ███   ███          ███ ███  ███    ███   ███    █▄  ███    █▄
  *   ███    ███ ███   ███    ▄█    ███ ███  ███   ▄███   ███    ███ ███    ███
  *   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
- * v. 0.3.3
+ * v. 0.3.4
  *
  * Copyright (c) 2018-2019 Jakub T. Jankiewicz <https://jcubic.pl/me>
  * Released under the MIT license
@@ -643,6 +643,9 @@
         // Returns "true" if, at the current <pos>, a string of characters
         // matches <match>. Does not increment <pos>.
         this.lookahead = function(match) {
+            if (SAUCE_ID === match) {
+                debugger;
+            }
             var i;
             for (i = 0; i < match.length; ++i) {
                 if ((pos + i === bytes.length) || (bytes[pos + i] !== match[i])) {

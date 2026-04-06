@@ -38,9 +38,6 @@ test:
 skipped_tests:
 	@! grep -E $(skip_re) __test__/ansidec.spec.js
 
-coveralls:
-	$(CAT) ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-
 lint:
 	$(ESLINT) index.js
 

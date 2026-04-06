@@ -32,10 +32,10 @@ npm install ansidec
 ```
 
 Besides npm you can also download that file locally or use
-[unpkg.com](https://unpkg.com/ansidec):
+[jsDelivr](https://www.jsdelivr.com/package/npm/ansidec):
 
 ```html
-<script src="https://unpkg.com/ansidec"></script>
+<script src="https://cdn.jsdelivr.net/npm/ansidec"></script>
 
 ```
 

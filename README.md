@@ -9,7 +9,7 @@
   ███    █▀   ▀█   █▀   ▄████████▀  █▀   ████████▀    ██████████ ████████▀
 ```
 
-[![npm](https://img.shields.io/badge/npm-0.3.4-blue.svg)](https://www.npmjs.com/package/ansidec)
+[![npm](https://img.shields.io/badge/npm-0.3.5-blue.svg)](https://www.npmjs.com/package/ansidec)
 [![CI](https://github.com/jcubic/ansidec/actions/workflows/ci.yml/badge.svg)](https://github.com/jcubic/ansidec/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jcubic/ansidec/badge.svg?branch=master)](https://coveralls.io/github/jcubic/ansidec?branch=master)
 [![MIT badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jcubic/jquery.terminal/blob/master/LICENSE)
@@ -121,6 +121,7 @@ meta object have those properties (description in SAUCE specification linked abo
 ```
 
 ### Changelog
+* 0.3.5 - migrate to GitHub Actions + replace unpkg with jsDelivr
 * 0.3.4 - fix GitHub url in README for npm
 * 0.3.3 - parse zstring from SAUCE + fixes to match unit tests
 * 0.3.2 - proper parsing of SAUCE comments
@@ -134,4 +135,4 @@ meta object have those properties (description in SAUCE specification linked abo
 
 Released under [MIT](http://opensource.org/licenses/MIT) license
 
-Copyright (c) 2018-2020 [Jakub T. Jankiewicz](https://jcubic.pl/)
+Copyright (c) 2018-2026 [Jakub T. Jankiewicz](https://jakub.jankiewicz.org/)

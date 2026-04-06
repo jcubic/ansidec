@@ -195,7 +195,7 @@
   "devDependencies": {
     "eslint": "^5.9.0",
     "iconv-lite": "^0.5.0",
-    "jest": "^25.0.0",
+    "jest": "^30.3.0",
     "uglify-js": "^3.4.9"
   }
 }
